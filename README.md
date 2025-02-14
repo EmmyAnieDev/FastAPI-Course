@@ -108,3 +108,13 @@ myapp/
 
 - Serialization Model helps us change data from our server/database into something any client that accesses our server can understand.
 - It can also be the reverse, where the client sends data to the server, and we deserialize it back into a format that our application or database can process.
+
+## SETTING UP A DATABASE
+
+```commandline
+pip install asyncpg
+pip install pydantic-settings
+pip install sqlmodel
+```
+
+- Create `.env` file and add your DB configurations
