@@ -1,5 +1,4 @@
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.sql import text
 from sqlmodel import SQLModel
 
 from config import Config
@@ -13,4 +12,6 @@ engine = create_async_engine(
 
 async def init_db():
     async with engine.begin() as conn:  # Open an async database connection
+        from api.books.v1.models import Book
+
         await conn.run_sync(SQLModel.metadata.create_all)  # Create all database tables based on defined models
