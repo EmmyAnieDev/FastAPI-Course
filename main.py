@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from typing import Optional
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -28,3 +28,16 @@ async def details(name: str, age: int) -> dict:
 @app.get('/person')
 async def person(name: str = "User", age: int = 0) -> dict:
     return {"name": name, "age": age}
+
+
+class BookCreateModel(BaseModel):   # Inheriting from Base Model class.
+    author: str
+    title: str
+
+
+@app.post('/create_book')
+async def create_book(book_data: BookCreateModel):  # book_data is an instance of BookCreateModel
+    return {
+        "author": book_data.author,
+        "title": book_data.title
+    }
