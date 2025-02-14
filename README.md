@@ -30,3 +30,5 @@ python3 -m venv env
 ```commandline
 pip install fastapi
 ```
+
+## Building a simple Web server
