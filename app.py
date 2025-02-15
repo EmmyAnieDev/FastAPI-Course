@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from api.books.v1.routes import book_router
-from api.db.db import init_db
+from api.v1.books.routes import book_router
+from db.db import init_db
 
 
 @asynccontextmanager
