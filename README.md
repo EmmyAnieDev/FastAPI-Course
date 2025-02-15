@@ -148,3 +148,10 @@ pip install alembic
   ```commandline
   alembic upgrade head
   ```
+  
+## Install PASSLIB to HASH users Password
+
+```commandline
+pip install passlib
+pip install bcrypt
+```
