@@ -1,7 +1,6 @@
 import logging
 import uuid
 from datetime import timedelta, datetime
-from typing import Any
 
 import jwt
 from passlib.context import CryptContext
