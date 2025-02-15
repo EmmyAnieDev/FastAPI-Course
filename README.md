@@ -43,7 +43,7 @@ myapp/
 │
 ├── app/
 │   ├── __init__.py
-│   ├── main.py               # FastAPI app initialization
+│   ├── db.py               # FastAPI app initialization
 │   │
 │   ├── middleware/           # Custom middleware
 │   │   ├── __init__.py

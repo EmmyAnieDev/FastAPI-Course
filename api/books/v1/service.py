@@ -1,3 +1,6 @@
+import uuid
+from datetime import datetime
+
 from sqlmodel import desc, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -20,11 +23,11 @@ class BookService:
 
 
     async def create_a_book(self, book_data: BookCreateModel, session: AsyncSession):
-        book_data_dict = book_data.model_dump()  # converts to a dictionary
-        new_book = Book(**book_data_dict)
+        book_data_dict = book_data.model_dump()  # Convert to dictionary
+        new_book = Book(**book_data_dict, uid=uuid.uuid4(), created_at=datetime.now(), updated_at=datetime.now())
+        new_book.published_date = datetime.strptime(book_data_dict['published_date'], '%Y-%m-%d')
         session.add(new_book)
         await session.commit()
-        await session.refresh(new_book)
         return new_book
 
 
@@ -38,6 +41,8 @@ class BookService:
         # Iterate through the update_data_dict and update each field of the book instance
         for k, v in update_data_dict.items():
             setattr(book_to_update, k, v)  # Dynamically update the book's attributes with new values
+
+        book_to_update.updated_at=datetime.now()
 
         await session.commit()
         await session.refresh(book_to_update)  # Refresh to get updated data
