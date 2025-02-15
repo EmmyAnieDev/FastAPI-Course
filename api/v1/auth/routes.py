@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -6,17 +6,18 @@ from fastapi import status, APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from api.v1.auth.dependency import RefreshTokenBearer
 from api.v1.auth.models import User
 from api.v1.auth.schema import UserCreateModel, UserLoginModel
 from api.v1.auth.service import UserService
 from api.v1.auth.utils import verify_password, create_access_token
 from db.db import get_session
 
-user_router = APIRouter()
+auth_router = APIRouter()
 user_service = UserService()
 
 
-@user_router.post('/signup', response_model=User, status_code=status.HTTP_201_CREATED)
+@auth_router.post('/signup', response_model=User, status_code=status.HTTP_201_CREATED)
 async def create_user_account(user_data: UserCreateModel, session: AsyncSession = Depends(get_session)):
     user_email = user_data.email
     user_exists = await user_service.user_exists(user_email, session)
@@ -28,7 +29,7 @@ async def create_user_account(user_data: UserCreateModel, session: AsyncSession 
     return new_user
 
 
-@user_router.post('/login', response_model=User, status_code=status.HTTP_200_OK)
+@auth_router.post('/login', response_model=User, status_code=status.HTTP_200_OK)
 async def login_user_account(login_data: UserLoginModel, session: AsyncSession = Depends(get_session)):
     email = login_data.email
     password = login_data.password
@@ -66,5 +67,38 @@ async def login_user_account(login_data: UserLoginModel, session: AsyncSession =
             "user": user_data,
             "access_token": access_token,
             "refresh_token": refresh_token
+        }
+    )
+
+
+@auth_router.get('/refresh_token')
+async def create_new_access_token(token_details: dict = Depends(RefreshTokenBearer())):
+
+    expiry_timestamp = token_details['exp']
+
+    if datetime.fromtimestamp(expiry_timestamp) <= datetime.now():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Refresh token expired")
+
+    new_access_token = create_access_token(
+        user_data={
+            'email': token_details['user']['email'],
+            'user_uid': str(token_details['user']['user_uid']),
+        }
+    )
+
+    new_refresh_token = create_access_token(
+        user_data={
+            'email': token_details['user']['email'],
+            'user_uid': str(token_details['user']['user_uid']),
+        },
+        expiry=timedelta(days=2),
+        refresh=True
+    )
+
+    return JSONResponse(
+        content={
+            "message": "New Tokens Created",
+            "access_token": new_access_token,
+            "refresh_token": new_refresh_token
         }
     )
