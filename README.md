@@ -155,3 +155,9 @@ pip install alembic
 pip install passlib
 pip install bcrypt
 ```
+  
+## Install JWT
+
+```commandline
+pip install pyjwt
+```
