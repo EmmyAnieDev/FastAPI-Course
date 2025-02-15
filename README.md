@@ -118,3 +118,33 @@ pip install sqlmodel
 ```
 
 - Create `.env` file and add your DB configurations
+
+## Alembic
+
+- Alembic is a database migration tool for SQLAlchemy that helps you manage and version-control changes to your database schema. 
+- It allows you to create, modify, and roll back database tables without losing data.
+
+```commandline
+pip install alembic
+```
+
+- To create a migration environment
+
+  ```commandline
+  alembic init -t async migrations
+  ```
+  
+  *Added: migrations/env.py line 9-14, 20 30, migrations/script.py.mako line 12*
+
+
+- migrations/versions: This track migration or database changes at a specific point of time.
+
+  ```commandline
+  alembic revision --autogenerate -m "init"
+  ```
+
+- Apply Migration to Database
+
+  ```commandline
+  alembic upgrade head
+  ```
