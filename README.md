@@ -161,3 +161,9 @@ pip install bcrypt
 ```commandline
 pip install pyjwt
 ```
+  
+## Install REDIS to store revoked tokens
+
+```commandline
+pip install redis
+```
