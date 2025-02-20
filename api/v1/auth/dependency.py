@@ -1,8 +1,11 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer
 from fastapi.requests import Request
+from sqlmodel.ext.asyncio.session import AsyncSession
 
+from api.v1.auth.service import UserService
 from api.v1.auth.utils import decode_token
+from db.db import get_session
 from db.redis import jti_in_blocklist
 
 
@@ -11,7 +14,8 @@ class TokenBearer(HTTPBearer):
     def __init__(self, auto_error=True):
         super().__init__(auto_error=auto_error)
 
-
+    # Allow creating an object from a class, enabling it to be called like a function (e.g., Depends(AccessTokenBearer())).
+    # Allow us create dependencies and then call them as functions.
     async def __call__(self, request: Request) -> dict:
         creds = await super().__call__(request)
         token = creds.credentials
@@ -21,12 +25,11 @@ class TokenBearer(HTTPBearer):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token")
 
         if await jti_in_blocklist(token_data['jti']):
-            raise HTTPException( status_code=status.HTTP_403_FORBIDDEN, detail="error: This token has been revoked")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="error: This token has been revoked")
 
         self.verify_token_data(token_data)
 
         return token_data
-
 
     @staticmethod
     def token_valid(token: str) -> bool:
@@ -50,3 +53,9 @@ class RefreshTokenBearer(TokenBearer):
     def verify_token_data(token_data: dict) -> None:
         if token_data and not token_data['refresh']:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Please provide a refresh token")
+
+
+async def get_current_user(token_details: dict = Depends(AccessTokenBearer()), session: AsyncSession = Depends(get_session)):
+    user_email = token_details['user']['email']
+    user = await UserService.get_user_by_email(user_email, session)
+    return user

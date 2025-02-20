@@ -6,7 +6,7 @@ from fastapi import status, APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from api.v1.auth.dependency import RefreshTokenBearer, AccessTokenBearer
+from api.v1.auth.dependency import RefreshTokenBearer, AccessTokenBearer, get_current_user
 from api.v1.auth.models import User
 from api.v1.auth.schema import UserCreateModel, UserLoginModel
 from api.v1.auth.service import UserService
@@ -101,6 +101,19 @@ async def create_new_access_token(token_details: dict = Depends(RefreshTokenBear
             "message": "New Tokens Created",
             "access_token": new_access_token,
             "refresh_token": new_refresh_token
+        }
+    )
+
+
+@auth_router.get('/user', status_code=status.HTTP_200_OK)
+async def get_current_user_account(current_user: dict = Depends(get_current_user)):
+
+    current_user = jsonable_encoder(current_user)
+
+    return JSONResponse(
+        content={
+            "message": "Retrieved current logged-in user Successfully",
+            "current_user": current_user
         }
     )
 

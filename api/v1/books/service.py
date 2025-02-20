@@ -9,20 +9,25 @@ from .schema import BookCreateModel, BookUpdateModel
 
 
 class BookService:
-    async def get_all_books(self, session: AsyncSession):
+
+
+    @staticmethod
+    async def get_all_books(session: AsyncSession):
         statement = select(Book).order_by(desc(Book.created_at))
         result = await session.exec(statement)
         return result.all()
 
 
-    async def get_book(self, book_uid: str, session: AsyncSession):
+    @staticmethod
+    async def get_book(book_uid: str, session: AsyncSession):
         statement = select(Book).where(Book.uid == book_uid)
         result = await session.exec(statement)
         book = result.first()
         return book if book is not None else None
 
 
-    async def create_a_book(self, book_data: BookCreateModel, session: AsyncSession):
+    @staticmethod
+    async def create_a_book(book_data: BookCreateModel, session: AsyncSession):
         book_data_dict = book_data.model_dump()  # Convert to dictionary
         new_book = Book(**book_data_dict, uid=uuid.uuid4(), created_at=datetime.now(), updated_at=datetime.now())
         new_book.published_date = datetime.strptime(book_data_dict['published_date'], '%Y-%m-%d')
@@ -42,7 +47,7 @@ class BookService:
         for k, v in update_data_dict.items():
             setattr(book_to_update, k, v)  # Dynamically update the book's attributes with new values
 
-        book_to_update.updated_at=datetime.now()
+        book_to_update.updated_at = datetime.now()
 
         await session.commit()
         await session.refresh(book_to_update)  # Refresh to get updated data

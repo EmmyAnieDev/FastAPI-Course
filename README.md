@@ -167,3 +167,25 @@ pip install pyjwt
 ```commandline
 pip install redis
 ```
+  
+## ROLE BASE ACCESS CONTROL (RBAC)
+
+This allows access to a specific endpoint/function within our API/APP depending on the role the user has within our Application.
+
+# admin
+[
+    "adding users",
+    "change roles",
+    "crud on users",
+    "book submissions",
+    "crud on books",
+    "crud on reviews",
+    "revoking access"
+]
+
+# users
+[
+    "crud on their own book submissions",
+    "crud on their reviews",
+    "crud on their own accounts"
+]
