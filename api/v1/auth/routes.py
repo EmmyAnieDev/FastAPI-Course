@@ -47,6 +47,7 @@ async def login_user_account(login_data: UserLoginModel, session: AsyncSession =
         user_data={
             'email': user.email,
             'user_uid': str(user.uid),
+            'role': user.role
         }
     )
 

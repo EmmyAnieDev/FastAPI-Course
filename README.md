@@ -137,7 +137,7 @@ pip install alembic
   *Added: migrations/env.py line 9-14, 20 30, migrations/script.py.mako line 12*
 
 
-- migrations/versions: This track migration or database changes at a specific point of time.
+- Migrations/Versions: This track migration or database changes at a specific point of time.
 
   ```commandline
   alembic revision --autogenerate -m "init"
