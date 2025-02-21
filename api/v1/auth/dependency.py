@@ -2,7 +2,9 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer
 from fastapi.requests import Request
 from sqlmodel.ext.asyncio.session import AsyncSession
+from typing import List, Any
 
+from api.v1.auth.models import User
 from api.v1.auth.service import UserService
 from api.v1.auth.utils import decode_token
 from db.db import get_session
@@ -59,3 +61,15 @@ async def get_current_user(token_details: dict = Depends(AccessTokenBearer()), s
     user_email = token_details['user']['email']
     user = await UserService.get_user_by_email(user_email, session)
     return user
+
+
+class CheckRole:
+
+    def __init__(self, allowed_roles: List[str]) -> None:
+        self.allowed_roles = allowed_roles
+
+    async def __call__(self, current_user: User = Depends(get_current_user)) -> Any:
+        if current_user.role in self.allowed_roles:
+            return True
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not permitted to perform this action!")
