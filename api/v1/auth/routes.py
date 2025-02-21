@@ -86,6 +86,7 @@ async def create_new_access_token(token_details: dict = Depends(RefreshTokenBear
         user_data={
             'email': token_details['user']['email'],
             'user_uid': str(token_details['user']['user_uid']),
+            'role': str(token_details['user']['role']),
         }
     )
 
