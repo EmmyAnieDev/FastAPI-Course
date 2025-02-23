@@ -1,7 +1,10 @@
 import uuid
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, Field
+
+from api.v1.books.models import Book
 
 
 class UserModel(BaseModel):
@@ -14,6 +17,7 @@ class UserModel(BaseModel):
     password_hash: str = Field(exclude=True)   # Exclude from Serialization
     created_at: datetime
     updated_at: datetime
+    books: List[Book]
 
 
 class UserCreateModel(BaseModel):
