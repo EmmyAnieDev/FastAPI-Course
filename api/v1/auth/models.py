@@ -5,7 +5,8 @@ from typing import List
 import sqlalchemy.dialects.postgresql as pg
 from sqlmodel import SQLModel, Field, Column, Relationship
 
-from api.v1.books import models
+from api.v1.books.models import Book
+from api.v1.reviews.models import Review
 
 
 class User(SQLModel, table=True):
@@ -28,7 +29,8 @@ class User(SQLModel, table=True):
     password_hash: str = Field(exclude=True)   # Exclude from Serialization
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now()))
     updated_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now()))
-    books: List["models.Book"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "selectin"})  # Lazy loading enabled
+    books: List["Book"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "selectin"})  # Lazy loading enabled
+    reviews: List["Review"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "selectin"})
 
     def __str__(self):
         return f"<User {self.username}>"

@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from api.v1.auth.models import User
 from api.v1.books.models import Book
+from api.v1.reviews.models import Review
 from sqlmodel import SQLModel
 from config import Config
 

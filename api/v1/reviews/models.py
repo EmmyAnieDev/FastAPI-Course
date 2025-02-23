@@ -1,15 +1,14 @@
 import uuid
-from datetime import datetime, date
+from datetime import datetime
 import sqlalchemy.dialects.postgresql as pg
 from sqlmodel import SQLModel, Field, Column, Relationship
-from typing import Optional, List
+from typing import Optional
 
 from api.v1.auth import models
-from api.v1.reviews.models import Review
 
 
-class Book(SQLModel, table=True):
-    __tablename__ = "books"
+class Review(SQLModel, table=True):
+    __tablename__ = "reviews"
 
     uid: uuid.UUID = Field(
         sa_column=Column(
@@ -19,18 +18,15 @@ class Book(SQLModel, table=True):
             default=uuid.uuid4()
         )
     )
-    title: str
-    author: str
-    publisher: str
-    published_date: date
-    page_count: int
-    language: str
+    rating: int = Field(lt=5)
+    review_text: str
     user_uid: Optional[uuid.UUID] = Field(default=None, foreign_key="users.uid")
+    book_uid: Optional[uuid.UUID] = Field(default=None, foreign_key="books.uid")
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now()))
     updated_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now()))
-    user: Optional["models.User"] = Relationship(back_populates="books")
-    reviews: List["Review"] = Relationship(back_populates="book", sa_relationship_kwargs={"lazy": "selectin"})
+    user: Optional["models.User"] = Relationship(back_populates="reviews")
+    book: Optional["models.Book"] = Relationship(back_populates="reviews")
 
 
     def __str__(self):
-        return f"<Book {self.title}>"
+        return f"<Review for book {self.book_uid} by user {self.user_uid}>"
