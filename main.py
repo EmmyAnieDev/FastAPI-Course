@@ -30,7 +30,7 @@ async def person(name: str = "User", age: int = 0) -> dict:
     return {"name": name, "age": age}
 
 
-class BookCreateModel(BaseModel):   # Inheriting from Base Model class.
+class BookCreateModel(BaseModel):  # Inheriting from Base Model class.
     author: str
     title: str
 

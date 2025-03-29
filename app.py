@@ -8,7 +8,7 @@ from db.db import init_db
 
 
 @asynccontextmanager
-async def life_span(app:FastAPI):
+async def life_span(app: FastAPI):
     print('Server is starting ...')
     await init_db()
     yield
@@ -27,3 +27,8 @@ app = FastAPI(
 app.include_router(book_router, prefix=f'/api/{version}/books', tags=['books'])
 app.include_router(auth_router, prefix=f'/api/{version}/auth', tags=['users'])
 app.include_router(review_router, prefix=f'/api/{version}/reviews', tags=['reviews'])
+
+
+@app.get('/')
+def server_health():
+    return "server is active..."
