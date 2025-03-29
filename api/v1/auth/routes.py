@@ -13,6 +13,7 @@ from api.v1.auth.service import UserService
 from api.v1.auth.utils import verify_password, create_access_token
 from db.db import get_session
 from db.redis import add_jti_to_blocklist
+from errors import UserAlreadyExists, UserNotFound, IncorrectPassword, RefreshTokenExpired
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -25,7 +26,7 @@ async def create_user_account(user_data: UserCreateModel, session: AsyncSession 
     user_exists = await user_service.user_exists(user_email, session)
 
     if user_exists:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User with email already exists")
+        raise UserAlreadyExists()
 
     new_user = await user_service.create_user_account(user_data, session)
     return new_user
@@ -39,10 +40,10 @@ async def login_user_account(login_data: UserLoginModel, session: AsyncSession =
     user = await user_service.get_user_by_email(email, session)
 
     if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exists")
+        raise UserNotFound()
 
     if not verify_password(password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Incorrect password")
+        raise IncorrectPassword()
 
     access_token = create_access_token(
         user_data={
@@ -80,7 +81,7 @@ async def create_new_access_token(token_details: dict = Depends(RefreshTokenBear
     expiry_timestamp = token_details['exp']
 
     if datetime.fromtimestamp(expiry_timestamp) <= datetime.now():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Refresh token expired")
+        raise RefreshTokenExpired()
 
     new_access_token = create_access_token(
         user_data={

@@ -9,6 +9,7 @@ from api.v1.auth.service import UserService
 from api.v1.auth.utils import decode_token
 from db.db import get_session
 from db.redis import jti_in_blocklist
+from errors import AccessTokenRequired, RefreshTokenRequired, InvalidToken, RevokedToken, InsufficientPermission
 
 
 class TokenBearer(HTTPBearer):
@@ -24,10 +25,10 @@ class TokenBearer(HTTPBearer):
         token_data = decode_token(token)
 
         if not self.token_valid(token):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token")
+            raise InvalidToken()
 
         if await jti_in_blocklist(token_data['jti']):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="error: This token has been revoked")
+            raise RevokedToken()
 
         self.verify_token_data(token_data)
 
@@ -47,14 +48,14 @@ class AccessTokenBearer(TokenBearer):
     @staticmethod
     def verify_token_data(token_data: dict) -> None:
         if token_data and token_data['refresh']:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Please provide an access token")
+            raise AccessTokenRequired()
 
 
 class RefreshTokenBearer(TokenBearer):
     @staticmethod
     def verify_token_data(token_data: dict) -> None:
         if token_data and not token_data['refresh']:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Please provide a refresh token")
+            raise RefreshTokenRequired
 
 
 async def get_current_user(token_details: dict = Depends(AccessTokenBearer()), session: AsyncSession = Depends(get_session)):
@@ -72,4 +73,4 @@ class CheckRole:
         if current_user.role in self.allowed_roles:
             return True
 
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not permitted to perform this action!")
+        raise InsufficientPermission()
