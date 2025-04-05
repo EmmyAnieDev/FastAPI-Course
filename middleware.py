@@ -1,7 +1,8 @@
 import time
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.requests import Request
+from starlette.responses import JSONResponse
 
 
 def register_middleware(app: FastAPI):
@@ -19,5 +20,20 @@ def register_middleware(app: FastAPI):
         end_time = time.time()
         duration = round(end_time - start_time, 4)
         print(f"--- Request End ---\nTime: {end_time}\nDuration: {duration} seconds\nPath: {request.url.path}")
+
+        return response
+
+
+    @app.middleware('http')
+    async def authorization(request: Request, call_next):
+        """middleware to check if Authorization header is present"""
+
+        if "authorization" not in request.headers:
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={"detail": "Authorization header missing"}
+            )
+
+        response = await call_next(request)
 
         return response
