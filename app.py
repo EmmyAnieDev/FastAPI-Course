@@ -6,10 +6,11 @@ from api.v1.books.routes import book_router
 from api.v1.reviews.routes import review_router
 from db.db import init_db
 from errors import register_all_errors
+from middleware import register_middleware
 
 
 @asynccontextmanager
-async def life_span(app: FastAPI):
+async def life_span():
     print('Server is starting ...')
     await init_db()
     yield
@@ -30,6 +31,7 @@ app.include_router(auth_router, prefix=f'/api/{version}/auth', tags=['users'])
 app.include_router(review_router, prefix=f'/api/{version}/reviews', tags=['reviews'])
 
 register_all_errors(app)
+register_middleware(app)
 
 
 @app.get('/')

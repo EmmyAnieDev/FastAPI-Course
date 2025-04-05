@@ -189,3 +189,9 @@ This allows access to a specific endpoint/function within our API/APP depending 
     "crud on their reviews",
     "crud on their own accounts"
 ]
+  
+## MIDDLEWARE
+
+These are functions that sit between our request and our responses. Middleware can be used to check for authentication, modify headers in request or response and more before actually sending them to wherever they'll be handled.
+
+**When a client makes a request, the `middkeware` get the request performs actions on that request and then send the request to the request handler function, which happens same way for response**
