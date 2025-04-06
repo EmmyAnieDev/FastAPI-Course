@@ -194,4 +194,6 @@ This allows access to a specific endpoint/function within our API/APP depending 
 
 These are functions that sit between our request and our responses. Middleware can be used to check for authentication, modify headers in request or response and more before actually sending them to wherever they'll be handled.
 
-**When a client makes a request, the `middkeware` get the request performs actions on that request and then send the request to the request handler function, which happens same way for response**
+**When a client makes a request, the `middleware` get the request performs actions on that request and then send the request to the request handler function, which happens same way for response**
+
+ - FastAPI is a framework built on the Asynchronous Server Gateway Interface (ASGI), which allows it to support any ASGI-compatible middleware using the `@app.middleware` decorator.

@@ -3,6 +3,8 @@ import time
 from fastapi import FastAPI, status
 from fastapi.requests import Request
 from starlette.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 
 def register_middleware(app: FastAPI):
@@ -24,16 +26,31 @@ def register_middleware(app: FastAPI):
         return response
 
 
-    @app.middleware('http')
-    async def authorization(request: Request, call_next):
-        """middleware to check if Authorization header is present"""
+    # @app.middleware('http')
+    # async def authorization(request: Request, call_next):
+    #     """middleware to check if Authorization header is present"""
+    #
+    #     if "authorization" not in request.headers:
+    #         return JSONResponse(
+    #             status_code=status.HTTP_401_UNAUTHORIZED,
+    #             content={"detail": "Authorization header missing"}
+    #         )
+    #
+    #     response = await call_next(request)
+    #
+    #     return response
 
-        if "authorization" not in request.headers:
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"detail": "Authorization header missing"}
-            )
 
-        response = await call_next(request)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+        allow_credentials=True,
+    )
 
-        return response
+
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=["localhost", "127.0.0.1"]
+    )
