@@ -8,17 +8,34 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.v1.auth.dependency import RefreshTokenBearer, AccessTokenBearer, get_current_user, CheckRole
 from api.v1.auth.models import User
-from api.v1.auth.schema import UserCreateModel, UserLoginModel, UserModel
+from api.v1.auth.schema import UserCreateModel, UserLoginModel, UserModel, EmailModel
 from api.v1.auth.service import UserService
 from api.v1.auth.utils import verify_password, create_access_token
 from db.db import get_session
 from db.redis import add_jti_to_blocklist
 from errors import UserAlreadyExists, UserNotFound, IncorrectPassword, RefreshTokenExpired
+from mail import create_message, mail
 
 auth_router = APIRouter()
 user_service = UserService()
 role_checker = CheckRole(['admin', 'user'])
 
+
+@auth_router.post('/send-mail', status_code=status.HTTP_200_OK)
+async def send_mail(emails: EmailModel):
+    emails = emails.addresses
+
+    html = "<h1>Welcome to the App</h1>"
+
+    message = create_message(
+        recipients=emails,
+        subject="Welcome",
+        body=html
+    )
+
+    await mail.send_message(message)
+
+    return {"message": "Email sent successfully!"}
 
 @auth_router.post('/signup', response_model=User, status_code=status.HTTP_201_CREATED)
 async def create_user_account(user_data: UserCreateModel, session: AsyncSession = Depends(get_session)):
