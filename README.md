@@ -197,3 +197,9 @@ These are functions that sit between our request and our responses. Middleware c
 **When a client makes a request, the `middleware` get the request performs actions on that request and then send the request to the request handler function, which happens same way for response**
 
  - FastAPI is a framework built on the Asynchronous Server Gateway Interface (ASGI), which allows it to support any ASGI-compatible middleware using the `@app.middleware` decorator.
+  
+## BACKGROUND TASK
+
+This refers to any task or process we want to move outside the request-response cycle to improve our application's performance.
+
+**Whenever we have a task that takes a long time and could slow down the response to the client, we move that task to a background process.**

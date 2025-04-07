@@ -2,8 +2,7 @@ from datetime import timedelta, datetime
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from fastapi import status, APIRouter, Depends
-from fastapi.exceptions import HTTPException
+from fastapi import status, APIRouter, Depends, BackgroundTasks
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.v1.auth.dependency import RefreshTokenBearer, AccessTokenBearer, get_current_user, CheckRole
@@ -25,7 +24,7 @@ role_checker = CheckRole(['admin', 'user'])
 
 
 @auth_router.post('/send-mail', status_code=status.HTTP_200_OK)
-async def send_mail(emails: EmailModel):
+def send_mail(emails: EmailModel, backgroundTask: BackgroundTasks):
     emails = emails.addresses
 
     html = "<h1>Welcome to the App</h1>"
@@ -36,7 +35,7 @@ async def send_mail(emails: EmailModel):
         body=html
     )
 
-    await mail.send_message(message)
+    backgroundTask.add_task(mail.send_message, message)
 
     return {"message": "Email sent successfully!"}
 
