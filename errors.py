@@ -54,7 +54,7 @@ class InvalidCredentials(BooklyException):
 
 
 class InsufficientPermission(BooklyException):
-    """User does not have the neccessary permissions to perform an action."""
+    """User does not have the necessary permissions to perform an action."""
 
     pass
 
@@ -79,6 +79,12 @@ class IncorrectPassword(BooklyException):
 
 class AccountNotVerified(Exception):
     """Account not yet verified"""
+    pass
+
+
+class PasswordDoNotMatch(BooklyException):
+    """password do not match"""
+
     pass
 
 
@@ -232,6 +238,18 @@ def register_all_errors(app: FastAPI):
                 "message": "Password Not correct",
                 "error_code": "provide correct password or change password",
                 "status_code": status.HTTP_401_UNAUTHORIZED,
+            },
+        ),
+    )
+
+    app.add_exception_handler(
+        PasswordDoNotMatch,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_detail={
+                "message": "Password do not match",
+                "error_code": "password_mismatch",
+                "status_code": status.HTTP_400_BAD_REQUEST,
             },
         ),
     )

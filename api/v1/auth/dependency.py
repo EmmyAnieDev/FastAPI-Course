@@ -9,7 +9,8 @@ from api.v1.auth.service import UserService
 from api.v1.auth.utils import decode_token
 from db.db import get_session
 from db.redis import jti_in_blocklist
-from errors import AccessTokenRequired, RefreshTokenRequired, InvalidToken, RevokedToken, InsufficientPermission
+from errors import AccessTokenRequired, RefreshTokenRequired, InvalidToken, RevokedToken, InsufficientPermission, \
+    AccountNotVerified
 
 
 class TokenBearer(HTTPBearer):
@@ -70,6 +71,9 @@ class CheckRole:
         self.allowed_roles = allowed_roles
 
     async def __call__(self, current_user: User = Depends(get_current_user)) -> Any:
+        if not current_user.is_verified:
+            raise AccountNotVerified
+
         if current_user.role in self.allowed_roles:
             return True
 
