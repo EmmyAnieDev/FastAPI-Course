@@ -17,6 +17,7 @@ from db.db import get_session
 from db.redis import add_jti_to_blocklist
 from errors import UserAlreadyExists, UserNotFound, IncorrectPassword, RefreshTokenExpired, PasswordDoNotMatch
 from mail import create_message, mail
+from api.v1.auth.celery_send_email import send_email
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -54,18 +55,14 @@ async def create_user_account(user_data: UserCreateModel, session: AsyncSession 
 
     link = f"http://{Config.DOMAIN_NAME}/api/v1/auth/verify/{token}"
 
+    emails = [user_email]
+    subject = "Verify your email"
     account_verification_message = f"""
     <h1>Verify your Email</h1>
     <p>Please click this <a href="{link}">link</a> to verify your email</p>
     """
 
-    message = create_message(
-        recipients=[user_email],
-        subject="Welcome, Verify your email",
-        body=account_verification_message
-    )
-
-    await mail.send_message(message)
+    send_email.delay(emails, subject, account_verification_message)
 
     return {
         "message": "Account created please verify your email",
@@ -195,18 +192,14 @@ async def password_reset(email_data: PasswordResetRequestModel):
 
     link = f"http://{Config.DOMAIN_NAME}/api/v1/auth/password-reset-confirm/{token}"
 
+    emails = [user_email]
+    subject = "Password Reset"
     password_reset_message = f"""
     <h1>Reset Your Password</h1>
     <p>Please click this <a href="{link}">link</a> to reset your password</p>
     """
 
-    message = create_message(
-        recipients=[user_email],
-        subject="Password reset",
-        body=password_reset_message
-    )
-
-    await mail.send_message(message)
+    send_email.delay(emails, subject, password_reset_message)
 
     return {
         "message": "Please check your email on instruction to reset your password",

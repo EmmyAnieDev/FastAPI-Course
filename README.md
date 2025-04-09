@@ -203,3 +203,19 @@ These are functions that sit between our request and our responses. Middleware c
 This refers to any task or process we want to move outside the request-response cycle to improve our application's performance.
 
 **Whenever we have a task that takes a long time and could slow down the response to the client, we move that task to a background process.**
+
+### CELERY
+
+Celery is used when we have multiple background tasks that could overload a single server and cause performance issues. It allows us to run these tasks on different servers, greatly improving overall performance.
+
+#### TO INSTALL CELERY
+
+```commandline
+pip install CELERY
+```
+
+- Broker: Acts as a message queue that delivers tasks from the Celery client to the workers.
+
+- Workers: These are processes that listen to the broker for incoming tasks and execute them when available.
+
+- Backend: A storage system where the results of executed tasks are saved, allowing clients to retrieve them later.
