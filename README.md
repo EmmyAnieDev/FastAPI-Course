@@ -219,3 +219,11 @@ pip install CELERY
 - Workers: These are processes that listen to the broker for incoming tasks and execute them when available.
 
 - Backend: A storage system where the results of executed tasks are saved, allowing clients to retrieve them later.
+
+## GETTING STARTED WITH TEST
+
+```commandline
+pip install pytest
+```
+
+- `conftest.py`: This file is used to define shared fixtures and override dependencies or configurations for your tests.
